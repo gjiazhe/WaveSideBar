@@ -17,8 +17,11 @@ import android.view.View;
 public class WaveSideBar extends View {
     private final int DEFAULT_TEXT_SIZE = 14; // sp
 
-    private String[] mIndexItems = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
-            "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private final String[] DEFAULT_INDEX_ITEMS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+            "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
+    private String[] mIndexItems;
+    private float drawWidth;
 
     private DisplayMetrics mDisplayMetrics;
 
@@ -27,6 +30,9 @@ public class WaveSideBar extends View {
     private float mTextSize;
     private float mIndexItemHeight;
 
+    private RectF mItemDrawArea = new RectF();
+
+    private boolean mStartTouching = false;
 
     private OnSelectIndexItemListener onSelectIndexItemListener;
 
@@ -48,6 +54,8 @@ public class WaveSideBar extends View {
         mTextSize = sp2px(DEFAULT_TEXT_SIZE);
         mIndexItemHeight = mTextSize * 1.3f;
         initPaint();
+
+        mIndexItems = DEFAULT_INDEX_ITEMS;
     }
 
     private void initPaint() {
@@ -63,13 +71,34 @@ public class WaveSideBar extends View {
         super.onDraw(canvas);
 
         // vertical center
-        float startY = (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2)
+        float textStartY = (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2)
                 - (mIndexItemHeight/2 - mTextSize/2);
 
-        for (String mIndexItem : mIndexItems) {
-            startY += mIndexItemHeight;
-            canvas.drawText(mIndexItem, getWidth() - mTextSize, startY, mPaint);
+        for (String indexItem : mIndexItems) {
+            textStartY += mIndexItemHeight;
+            canvas.drawText(indexItem, getWidth() - drawWidth / 2, textStartY, mPaint);
         }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        float drawHeight = mIndexItems.length*mIndexItemHeight;
+        float mStartDrawY = getHeight() / 2 - drawHeight / 2;
+
+        for (String indexItem : mIndexItems) {
+            float itemTextWidth = mPaint.measureText(indexItem);
+            drawWidth = Math.max(drawWidth, itemTextWidth);
+        }
+        float mStartDrawX = getWidth() - drawWidth;
+
+        mItemDrawArea.set(mStartDrawX, mStartDrawY, mStartDrawX + drawWidth, mStartDrawY + drawHeight);
+    }
+
+    public void setIndexItems(String[] indexItems) {
+        mIndexItems = indexItems;
+        requestLayout();
     }
 
     @Override
@@ -79,21 +108,37 @@ public class WaveSideBar extends View {
         }
 
         float eventY = event.getY();
+        float eventX = event.getX();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                int index = getSelectedIndex(eventY);
-                if (onSelectIndexItemListener != null) {
+                if (mItemDrawArea.contains(eventX, eventY)) {
+                    if (onSelectIndexItemListener != null) {
+                        int index = getSelectedIndex(eventY);
+                        onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
+                    }
+                    mStartTouching = true;
+                }
+                return true;
+
+            case MotionEvent.ACTION_MOVE:
+                if (mStartTouching && onSelectIndexItemListener != null) {
+                    int index = getSelectedIndex(eventY);
                     onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
                 }
+                return true;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mStartTouching = false;
+                return true;
         }
 
         return super.onTouchEvent(event);
     }
 
     private int getSelectedIndex(float eventY) {
-        float currentY = eventY - getPaddingTop()
-                - (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2);
+        float currentY = eventY - (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2);
 
         int index = (int) (currentY / this.mIndexItemHeight);
         if (index <= 0) {
