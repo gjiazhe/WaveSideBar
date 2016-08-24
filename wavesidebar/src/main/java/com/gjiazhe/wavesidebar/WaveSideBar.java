@@ -1,6 +1,7 @@
 package com.gjiazhe.wavesidebar;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -34,6 +35,8 @@ public class WaveSideBar extends View {
 
     private boolean mStartTouching = false;
 
+    private boolean mLazyRespond = false;
+
     private OnSelectIndexItemListener onSelectIndexItemListener;
 
 
@@ -48,6 +51,11 @@ public class WaveSideBar extends View {
     public WaveSideBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        TypedArray typedArray = context.obtainStyledAttributes(attrs,
+                R.styleable.WaveSideBar);
+        mLazyRespond = typedArray.getBoolean(R.styleable.WaveSideBar_lazy_respond, false);
+        typedArray.recycle();
+
         mDisplayMetrics = getContext().getResources().getDisplayMetrics();
 
         mTextColor = Color.GRAY;
@@ -56,6 +64,7 @@ public class WaveSideBar extends View {
         initPaint();
 
         mIndexItems = DEFAULT_INDEX_ITEMS;
+
     }
 
     private void initPaint() {
@@ -112,7 +121,7 @@ public class WaveSideBar extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (mItemDrawArea.contains(eventX, eventY)) {
+                if (!mLazyRespond && mItemDrawArea.contains(eventX, eventY)) {
                     if (onSelectIndexItemListener != null) {
                         int index = getSelectedIndex(eventY);
                         onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
@@ -122,7 +131,7 @@ public class WaveSideBar extends View {
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                if (mStartTouching && onSelectIndexItemListener != null) {
+                if (mStartTouching && !mLazyRespond && onSelectIndexItemListener != null) {
                     int index = getSelectedIndex(eventY);
                     onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
                 }
@@ -130,6 +139,10 @@ public class WaveSideBar extends View {
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                if (mLazyRespond && onSelectIndexItemListener != null) {
+                    int index = getSelectedIndex(eventY);
+                    onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
+                }
                 mStartTouching = false;
                 return true;
         }
