@@ -22,6 +22,9 @@ public class WaveSideBar extends View {
             "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
     private String[] mIndexItems;
+    private int mCurrentIndex = -1;
+    private float mCurrentY;
+
     private float drawWidth;
 
     private DisplayMetrics mDisplayMetrics;
@@ -60,7 +63,6 @@ public class WaveSideBar extends View {
 
         mTextColor = Color.GRAY;
         mTextSize = sp2px(DEFAULT_TEXT_SIZE);
-        mIndexItemHeight = mTextSize * 1.3f;
         initPaint();
 
         mIndexItems = DEFAULT_INDEX_ITEMS;
@@ -71,7 +73,7 @@ public class WaveSideBar extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setTextAlign(Paint.Align.CENTER);
-        mPaint.setColor(this.mTextColor);
+        mPaint.setColor(mTextColor);
         mPaint.setTextSize(mTextSize);
     }
 
@@ -80,12 +82,14 @@ public class WaveSideBar extends View {
         super.onDraw(canvas);
 
         // vertical center
-        float textStartY = (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2)
-                - (mIndexItemHeight/2 - mTextSize/2);
+        float firstItemBaseLineY = (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2)
+                + (mIndexItemHeight/2 - mIndexItemHeight/2)
+                - mPaint.getFontMetrics().ascent;
 
-        for (String indexItem : mIndexItems) {
-            textStartY += mIndexItemHeight;
-            canvas.drawText(indexItem, getWidth() - drawWidth / 2, textStartY, mPaint);
+        // draw each item
+        for (int i = 0, mIndexItemsLength = mIndexItems.length; i < mIndexItemsLength; i++) {
+            float baseLineY = firstItemBaseLineY + mIndexItemHeight*i;
+            canvas.drawText(mIndexItems[i], getWidth() - drawWidth/2, baseLineY, mPaint);
         }
     }
 
@@ -93,12 +97,14 @@ public class WaveSideBar extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
+        Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
+        mIndexItemHeight = fontMetrics.bottom - fontMetrics.top;
+
         float drawHeight = mIndexItems.length*mIndexItemHeight;
-        float mStartDrawY = getHeight() / 2 - drawHeight / 2;
+        float mStartDrawY = getHeight()/2 - drawHeight/2;
 
         for (String indexItem : mIndexItems) {
-            float itemTextWidth = mPaint.measureText(indexItem);
-            drawWidth = Math.max(drawWidth, itemTextWidth);
+            drawWidth = Math.max(drawWidth, mPaint.measureText(indexItem));
         }
         float mStartDrawX = getWidth() - drawWidth;
 
@@ -121,29 +127,33 @@ public class WaveSideBar extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (!mLazyRespond && mItemDrawArea.contains(eventX, eventY)) {
-                    if (onSelectIndexItemListener != null) {
-                        int index = getSelectedIndex(eventY);
-                        onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
-                    }
+                if (mItemDrawArea.contains(eventX, eventY)) {
                     mStartTouching = true;
+                    if (!mLazyRespond && onSelectIndexItemListener != null) {
+                        mCurrentIndex = getSelectedIndex(eventY);
+                        onSelectIndexItemListener.onSelectIndexItem(mIndexItems[mCurrentIndex]);
+                    }
                 }
+                invalidate();
                 return true;
 
             case MotionEvent.ACTION_MOVE:
                 if (mStartTouching && !mLazyRespond && onSelectIndexItemListener != null) {
-                    int index = getSelectedIndex(eventY);
-                    onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
+                    mCurrentIndex = getSelectedIndex(eventY);
+                    onSelectIndexItemListener.onSelectIndexItem(mIndexItems[mCurrentIndex]);
                 }
+                invalidate();
                 return true;
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 if (mLazyRespond && onSelectIndexItemListener != null) {
-                    int index = getSelectedIndex(eventY);
-                    onSelectIndexItemListener.onSelectIndexItem(mIndexItems[index]);
+                    mCurrentIndex = getSelectedIndex(eventY);
+                    onSelectIndexItemListener.onSelectIndexItem(mIndexItems[mCurrentIndex]);
                 }
+                mCurrentIndex = -1;
                 mStartTouching = false;
+                invalidate();
                 return true;
         }
 
@@ -151,9 +161,9 @@ public class WaveSideBar extends View {
     }
 
     private int getSelectedIndex(float eventY) {
-        float currentY = eventY - (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2);
+        mCurrentY = eventY - (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2);
 
-        int index = (int) (currentY / this.mIndexItemHeight);
+        int index = (int) (mCurrentY / this.mIndexItemHeight);
         if (index <= 0) {
             return 0;
         }
