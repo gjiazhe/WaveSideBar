@@ -17,6 +17,7 @@ import android.view.View;
  */
 public class WaveSideBar extends View {
     private final int DEFAULT_TEXT_SIZE = 14; // sp
+    private final int DEFAULT_MAX_OFFSET = 100; //dp
 
     private final String[] DEFAULT_INDEX_ITEMS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
             "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
@@ -33,6 +34,8 @@ public class WaveSideBar extends View {
     private int mTextColor;
     private float mTextSize;
     private float mIndexItemHeight;
+
+    private float mMaxOffset;
 
     private RectF mItemDrawArea = new RectF();
 
@@ -67,6 +70,7 @@ public class WaveSideBar extends View {
 
         mIndexItems = DEFAULT_INDEX_ITEMS;
 
+        mMaxOffset = dp2px(DEFAULT_MAX_OFFSET);
     }
 
     private void initPaint() {
@@ -89,7 +93,33 @@ public class WaveSideBar extends View {
         // draw each item
         for (int i = 0, mIndexItemsLength = mIndexItems.length; i < mIndexItemsLength; i++) {
             float baseLineY = firstItemBaseLineY + mIndexItemHeight*i;
-            canvas.drawText(mIndexItems[i], getWidth() - drawWidth/2, baseLineY, mPaint);
+
+            // calculate the scale factor of the item to draw
+            float scale = 0;
+            if (mCurrentIndex != -1) {
+                scale = 1 - Math.abs(mCurrentY - (mIndexItemHeight*i+mIndexItemHeight/2)) / mIndexItemHeight / 4;
+                scale = Math.max(scale, 0);
+
+//                Log.i("scale", mIndexItems[i] + ": " + scale);
+                if (i == mCurrentIndex) {
+                    mPaint.setAlpha(255);
+                } else {
+                    mPaint.setAlpha((int)(255 * (1-scale)));
+                }
+            }
+
+            mPaint.setTextSize(mTextSize + mTextSize*scale);
+
+            // draw
+            canvas.drawText(
+                    mIndexItems[i], //item text to draw
+                    getWidth() - drawWidth/2 - mMaxOffset*scale, //center text X
+                    baseLineY, // baseLineY
+                    mPaint);
+
+            // reset
+            mPaint.setTextSize(mTextSize);
+            mPaint.setAlpha(255);
         }
     }
 
@@ -162,11 +192,11 @@ public class WaveSideBar extends View {
 
     private int getSelectedIndex(float eventY) {
         mCurrentY = eventY - (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2);
-
-        int index = (int) (mCurrentY / this.mIndexItemHeight);
-        if (index <= 0) {
+        if (mCurrentY <= 0) {
             return 0;
         }
+
+        int index = (int) (mCurrentY / this.mIndexItemHeight);
         if (index >= this.mIndexItems.length) {
             index = this.mIndexItems.length - 1;
         }
