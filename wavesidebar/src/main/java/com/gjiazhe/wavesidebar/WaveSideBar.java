@@ -26,6 +26,7 @@ public class WaveSideBar extends View {
     private int mCurrentIndex = -1;
     private float mCurrentY;
 
+    private float drawHeight;
     private float drawWidth;
 
     private DisplayMetrics mDisplayMetrics;
@@ -45,6 +46,8 @@ public class WaveSideBar extends View {
 
     private OnSelectIndexItemListener onSelectIndexItemListener;
 
+    // the baseline of the first index item text to draw
+    private float mFirstItemBaseLineY;
 
     public WaveSideBar(Context context) {
         this(context, null);
@@ -85,28 +88,19 @@ public class WaveSideBar extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // vertical center
-        float firstItemBaseLineY = (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2)
-                + (mIndexItemHeight/2 - mIndexItemHeight/2)
-                - mPaint.getFontMetrics().ascent;
-
         // draw each item
         for (int i = 0, mIndexItemsLength = mIndexItems.length; i < mIndexItemsLength; i++) {
-            float baseLineY = firstItemBaseLineY + mIndexItemHeight*i;
+            float baseLineY = mFirstItemBaseLineY + mIndexItemHeight*i;
 
             // calculate the scale factor of the item to draw
             float scale = 0;
             if (mCurrentIndex != -1) {
                 scale = 1 - Math.abs(mCurrentY - (mIndexItemHeight*i+mIndexItemHeight/2)) / mIndexItemHeight / 4;
                 scale = Math.max(scale, 0);
-
-//                Log.i("scale", mIndexItems[i] + ": " + scale);
-                if (i == mCurrentIndex) {
-                    mPaint.setAlpha(255);
-                } else {
-                    mPaint.setAlpha((int)(255 * (1-scale)));
-                }
             }
+
+            int alphaScale = (i == mCurrentIndex) ? (255) : (int) (255 * (1-scale));
+            mPaint.setAlpha(alphaScale);
 
             mPaint.setTextSize(mTextSize + mTextSize*scale);
 
@@ -116,10 +110,6 @@ public class WaveSideBar extends View {
                     getWidth() - drawWidth/2 - mMaxOffset*scale, //center text X
                     baseLineY, // baseLineY
                     mPaint);
-
-            // reset
-            mPaint.setTextSize(mTextSize);
-            mPaint.setAlpha(255);
         }
     }
 
@@ -127,18 +117,25 @@ public class WaveSideBar extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+
         Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
         mIndexItemHeight = fontMetrics.bottom - fontMetrics.top;
-
-        float drawHeight = mIndexItems.length*mIndexItemHeight;
-        float mStartDrawY = getHeight()/2 - drawHeight/2;
 
         for (String indexItem : mIndexItems) {
             drawWidth = Math.max(drawWidth, mPaint.measureText(indexItem));
         }
-        float mStartDrawX = getWidth() - drawWidth;
+        drawHeight = mIndexItems.length * mIndexItemHeight;
 
-        mItemDrawArea.set(mStartDrawX, mStartDrawY, mStartDrawX + drawWidth, mStartDrawY + drawHeight);
+        float startDrawX = width - drawWidth;
+        float startDrawY = height/2 - drawHeight/2;
+
+        mItemDrawArea.set(startDrawX, startDrawY, startDrawX + drawWidth, startDrawY + drawHeight);
+
+        mFirstItemBaseLineY = (height/2 - mIndexItems.length*mIndexItemHeight/2)
+                + (mIndexItemHeight/2 - (fontMetrics.descent-fontMetrics.ascent)/2)
+                - fontMetrics.ascent;
     }
 
     public void setIndexItems(String[] indexItems) {
@@ -191,7 +188,7 @@ public class WaveSideBar extends View {
     }
 
     private int getSelectedIndex(float eventY) {
-        mCurrentY = eventY - (getHeight()/2 - mIndexItems.length*mIndexItemHeight/2);
+        mCurrentY = eventY - (getHeight()/2 - drawHeight/2);
         if (mCurrentY <= 0) {
             return 0;
         }
@@ -207,13 +204,7 @@ public class WaveSideBar extends View {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, this.mDisplayMetrics);
     }
 
-
-    private float dp2px(float dp) {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, this.mDisplayMetrics);
-    }
-
-
-    private float sp2px(float sp) {
+    private float sp2px(int sp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, this.mDisplayMetrics);
     }
 
