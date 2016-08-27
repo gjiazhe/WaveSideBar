@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="WaveSideBar">
         <attr name="lazy_respond" format="boolean"/>
+        <attr name="text_color" format="color"/>
     </declare-styleable>
 </resources>

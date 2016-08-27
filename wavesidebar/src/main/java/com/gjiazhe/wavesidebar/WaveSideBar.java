@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -104,17 +105,17 @@ public class WaveSideBar extends View {
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
                 R.styleable.WaveSideBar);
         mLazyRespond = typedArray.getBoolean(R.styleable.WaveSideBar_lazy_respond, false);
+        mTextColor = typedArray.getColor(R.styleable.WaveSideBar_text_color, Color.GRAY);
         typedArray.recycle();
 
         mDisplayMetrics = getContext().getResources().getDisplayMetrics();
 
-        mTextColor = Color.GRAY;
         mTextSize = sp2px(DEFAULT_TEXT_SIZE);
-        initPaint();
+        mMaxOffset = dp2px(DEFAULT_MAX_OFFSET);
 
         mIndexItems = DEFAULT_INDEX_ITEMS;
 
-        mMaxOffset = dp2px(DEFAULT_MAX_OFFSET);
+        initPaint();
     }
 
     private void initPaint() {
@@ -138,6 +139,7 @@ public class WaveSideBar extends View {
             if (mCurrentIndex != -1) {
                 scale = 1 - Math.abs(mCurrentY - (mIndexItemHeight*i+mIndexItemHeight/2)) / mIndexItemHeight / 4;
                 scale = Math.max(scale, 0);
+                Log.i("scale", mIndexItems[i] + ": " + scale);
             }
 
             int alphaScale = (i == mCurrentIndex) ? (255) : (int) (255 * (1-scale));
@@ -247,6 +249,12 @@ public class WaveSideBar extends View {
 
     private float sp2px(int sp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, this.mDisplayMetrics);
+    }
+
+    public void setTextColor(int color) {
+        mTextColor = color;
+        mPaint.setColor(color);
+        invalidate();
     }
 
     public void setOnSelectIndexItemListener(OnSelectIndexItemListener onSelectIndexItemListener) {
