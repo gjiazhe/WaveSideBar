@@ -23,31 +23,72 @@ public class WaveSideBar extends View {
             "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
     private String[] mIndexItems;
+
+    /**
+     * the index in {@link #mIndexItems} of the current selected index item,
+     * it's reset to -1 when the finger up
+     */
     private int mCurrentIndex = -1;
-    private float mCurrentY;
 
-    private float drawHeight;
-    private float drawWidth;
-
-    private DisplayMetrics mDisplayMetrics;
+    /**
+     * Y coordinate of the point where finger is touching,
+     * the baseline is top of {@link #mBarArea}
+     * it's reset to -1 when the finger up
+     */
+    private float mCurrentY = -1;
 
     private Paint mPaint;
     private int mTextColor;
     private float mTextSize;
+
+    /**
+     * the height of each index item
+     */
     private float mIndexItemHeight;
 
+    /**
+     * offset of the current selected index item
+     */
     private float mMaxOffset;
 
-    private RectF mItemDrawArea = new RectF();
+    /**
+     * area where the bar is draw
+     */
+    private RectF mBarArea = new RectF();
 
+    /**
+     * height and width of {@link #mBarArea}
+     */
+    private float mBarHeight;
+    private float mBarWidth;
+
+    /**
+     * flag that the finger is starting touching
+     */
     private boolean mStartTouching = false;
 
+    /**
+     * if true, the {@link OnSelectIndexItemListener#onSelectIndexItem(String)}
+     * will not be called until the finger up.
+     * if false, it will be called when the finger down, up and move.
+     */
     private boolean mLazyRespond = false;
 
+    /**
+     * observe the current selected index item
+     */
     private OnSelectIndexItemListener onSelectIndexItemListener;
 
-    // the baseline of the first index item text to draw
+    /**
+     * the baseline of the first index item text to draw
+     */
     private float mFirstItemBaseLineY;
+
+    /**
+     * for {@link #dp2px(int)} and {@link #sp2px(int)}
+     */
+    private DisplayMetrics mDisplayMetrics;
+
 
     public WaveSideBar(Context context) {
         this(context, null);
@@ -107,7 +148,7 @@ public class WaveSideBar extends View {
             // draw
             canvas.drawText(
                     mIndexItems[i], //item text to draw
-                    getWidth() - drawWidth/2 - mMaxOffset*scale, //center text X
+                    getWidth() - mBarWidth /2 - mMaxOffset*scale, //center text X
                     baseLineY, // baseLineY
                     mPaint);
         }
@@ -124,14 +165,14 @@ public class WaveSideBar extends View {
         mIndexItemHeight = fontMetrics.bottom - fontMetrics.top;
 
         for (String indexItem : mIndexItems) {
-            drawWidth = Math.max(drawWidth, mPaint.measureText(indexItem));
+            mBarWidth = Math.max(mBarWidth, mPaint.measureText(indexItem));
         }
-        drawHeight = mIndexItems.length * mIndexItemHeight;
+        mBarHeight = mIndexItems.length * mIndexItemHeight;
 
-        float startDrawX = width - drawWidth;
-        float startDrawY = height/2 - drawHeight/2;
+        float startDrawX = width - mBarWidth;
+        float startDrawY = height/2 - mBarHeight /2;
 
-        mItemDrawArea.set(startDrawX, startDrawY, startDrawX + drawWidth, startDrawY + drawHeight);
+        mBarArea.set(startDrawX, startDrawY, startDrawX + mBarWidth, startDrawY + mBarHeight);
 
         mFirstItemBaseLineY = (height/2 - mIndexItems.length*mIndexItemHeight/2)
                 + (mIndexItemHeight/2 - (fontMetrics.descent-fontMetrics.ascent)/2)
@@ -154,7 +195,7 @@ public class WaveSideBar extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (mItemDrawArea.contains(eventX, eventY)) {
+                if (mBarArea.contains(eventX, eventY)) {
                     mStartTouching = true;
                     if (!mLazyRespond && onSelectIndexItemListener != null) {
                         mCurrentIndex = getSelectedIndex(eventY);
@@ -188,7 +229,7 @@ public class WaveSideBar extends View {
     }
 
     private int getSelectedIndex(float eventY) {
-        mCurrentY = eventY - (getHeight()/2 - drawHeight/2);
+        mCurrentY = eventY - (getHeight()/2 - mBarHeight /2);
         if (mCurrentY <= 0) {
             return 0;
         }
