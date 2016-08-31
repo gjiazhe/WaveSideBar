@@ -127,6 +127,31 @@ public class WaveSideBar extends View {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+
+        Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
+        mIndexItemHeight = fontMetrics.bottom - fontMetrics.top;
+        mBarHeight = mIndexItems.length * mIndexItemHeight;
+
+        for (String indexItem : mIndexItems) {
+            mBarWidth = Math.max(mBarWidth, mPaint.measureText(indexItem));
+        }
+
+        float startDrawX = width - mBarWidth;
+        float startDrawY = height/2 - mBarHeight/2;
+
+        mBarArea.set(startDrawX, startDrawY, startDrawX + mBarWidth, startDrawY + mBarHeight);
+
+        mFirstItemBaseLineY = (height/2 - mIndexItems.length*mIndexItemHeight/2)
+                + (mIndexItemHeight/2 - (fontMetrics.descent-fontMetrics.ascent)/2)
+                - fontMetrics.ascent;
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
@@ -135,12 +160,7 @@ public class WaveSideBar extends View {
             float baseLineY = mFirstItemBaseLineY + mIndexItemHeight*i;
 
             // calculate the scale factor of the item to draw
-            float scale = 0;
-            if (mCurrentIndex != -1) {
-                scale = 1 - Math.abs(mCurrentY - (mIndexItemHeight*i+mIndexItemHeight/2)) / mIndexItemHeight / 4;
-                scale = Math.max(scale, 0);
-                Log.i("scale", mIndexItems[i] + ": " + scale);
-            }
+            float scale = getScale(i);
 
             int alphaScale = (i == mCurrentIndex) ? (255) : (int) (255 * (1-scale));
             mPaint.setAlpha(alphaScale);
@@ -156,29 +176,21 @@ public class WaveSideBar extends View {
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-
-        Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
-        mIndexItemHeight = fontMetrics.bottom - fontMetrics.top;
-
-        for (String indexItem : mIndexItems) {
-            mBarWidth = Math.max(mBarWidth, mPaint.measureText(indexItem));
+    /**
+     * calculate the scale factor of the item to draw
+     *
+     * @param index the index of the item in array {@link #mIndexItems}
+     * @return the scale factor if the item to draw
+     */
+    private float getScale(int index) {
+        float scale = 0;
+        if (mCurrentIndex != -1) {
+            float distance = Math.abs(mCurrentY - (mIndexItemHeight*index+mIndexItemHeight/2)) / mIndexItemHeight;
+            scale = 1 - distance*distance/16;
+            scale = Math.max(scale, 0);
+//                Log.i("scale", mIndexItems[index] + ": " + scale);
         }
-        mBarHeight = mIndexItems.length * mIndexItemHeight;
-
-        float startDrawX = width - mBarWidth;
-        float startDrawY = height/2 - mBarHeight /2;
-
-        mBarArea.set(startDrawX, startDrawY, startDrawX + mBarWidth, startDrawY + mBarHeight);
-
-        mFirstItemBaseLineY = (height/2 - mIndexItems.length*mIndexItemHeight/2)
-                + (mIndexItemHeight/2 - (fontMetrics.descent-fontMetrics.ascent)/2)
-                - fontMetrics.ascent;
+        return scale;
     }
 
     public void setIndexItems(String[] indexItems) {
