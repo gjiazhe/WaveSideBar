@@ -15,7 +15,8 @@
         android:id="@+id/sideBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:text_color="@color/colorAccent"/>
+        app:sidebar_text_color="@color/colorAccent"
+        app:sidebar_position="left"/>
 
     <View
         android:layout_width="match_parent"

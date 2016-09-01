@@ -8,19 +8,20 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.Arrays;
 
 /**
  * Created by gjz on 8/23/16.
  */
 public class WaveSideBar extends View {
-    private final int DEFAULT_TEXT_SIZE = 14; // sp
-    private final int DEFAULT_MAX_OFFSET = 100; //dp
+    private final static int DEFAULT_TEXT_SIZE = 14; // sp
+    private final static int DEFAULT_MAX_OFFSET = 100; //dp
 
-    private final String[] DEFAULT_INDEX_ITEMS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+    private final static String[] DEFAULT_INDEX_ITEMS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
             "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
     private String[] mIndexItems;
@@ -76,6 +77,14 @@ public class WaveSideBar extends View {
     private boolean mLazyRespond = false;
 
     /**
+     * the position of the side bar, default is {@link #POSITION_RIGHT}.
+     * You can set it to {@link #POSITION_LEFT} for people who use phone with left hand.
+     */
+    private int mSideBarPosition;
+    private static final int POSITION_RIGHT = 0;
+    private static final int POSITION_LEFT = 1;
+
+    /**
      * observe the current selected index item
      */
     private OnSelectIndexItemListener onSelectIndexItemListener;
@@ -104,8 +113,9 @@ public class WaveSideBar extends View {
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs,
                 R.styleable.WaveSideBar);
-        mLazyRespond = typedArray.getBoolean(R.styleable.WaveSideBar_lazy_respond, false);
-        mTextColor = typedArray.getColor(R.styleable.WaveSideBar_text_color, Color.GRAY);
+        mLazyRespond = typedArray.getBoolean(R.styleable.WaveSideBar_sidebar_lazy_respond, false);
+        mTextColor = typedArray.getColor(R.styleable.WaveSideBar_sidebar_text_color, Color.GRAY);
+        mSideBarPosition = typedArray.getInt(R.styleable.WaveSideBar_sidebar_position, POSITION_RIGHT);
         typedArray.recycle();
 
         mDisplayMetrics = getContext().getResources().getDisplayMetrics();
@@ -141,7 +151,7 @@ public class WaveSideBar extends View {
             mBarWidth = Math.max(mBarWidth, mPaint.measureText(indexItem));
         }
 
-        float startDrawX = width - mBarWidth;
+        float startDrawX = (mSideBarPosition == POSITION_LEFT) ? 0 : (width - mBarWidth);
         float startDrawY = height/2 - mBarHeight/2;
 
         mBarArea.set(startDrawX, startDrawY, startDrawX + mBarWidth, startDrawY + mBarHeight);
@@ -167,10 +177,14 @@ public class WaveSideBar extends View {
 
             mPaint.setTextSize(mTextSize + mTextSize*scale);
 
+            float drawX = (mSideBarPosition == POSITION_LEFT) ?
+                    (mBarWidth/2 + mMaxOffset*scale) :
+                    (getWidth() - mBarWidth/2 - mMaxOffset*scale);
+
             // draw
             canvas.drawText(
                     mIndexItems[i], //item text to draw
-                    getWidth() - mBarWidth /2 - mMaxOffset*scale, //center text X
+                    drawX, //center text X
                     baseLineY, // baseLineY
                     mPaint);
         }
@@ -194,7 +208,7 @@ public class WaveSideBar extends View {
     }
 
     public void setIndexItems(String[] indexItems) {
-        mIndexItems = indexItems;
+        mIndexItems = Arrays.copyOf(indexItems, indexItems.length);
         requestLayout();
     }
 
