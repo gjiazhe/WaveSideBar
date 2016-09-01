@@ -34,7 +34,7 @@ public class WaveSideBar extends View {
 
     /**
      * Y coordinate of the point where finger is touching,
-     * the baseline is top of {@link #mBarArea}
+     * the baseline is top of {@link #mStartTouchingArea}
      * it's reset to -1 when the finger up
      */
     private float mCurrentY = -1;
@@ -54,12 +54,13 @@ public class WaveSideBar extends View {
     private float mMaxOffset;
 
     /**
-     * area where the bar is draw
+     * {@link #mStartTouching} will be set to true when {@link MotionEvent#ACTION_DOWN}
+     * happens in this area, and the side bar should start working.
      */
-    private RectF mBarArea = new RectF();
+    private RectF mStartTouchingArea = new RectF();
 
     /**
-     * height and width of {@link #mBarArea}
+     * height and width of {@link #mStartTouchingArea}
      */
     private float mBarHeight;
     private float mBarWidth;
@@ -151,10 +152,15 @@ public class WaveSideBar extends View {
             mBarWidth = Math.max(mBarWidth, mPaint.measureText(indexItem));
         }
 
-        float startDrawX = (mSideBarPosition == POSITION_LEFT) ? 0 : (width - mBarWidth);
-        float startDrawY = height/2 - mBarHeight/2;
-
-        mBarArea.set(startDrawX, startDrawY, startDrawX + mBarWidth, startDrawY + mBarHeight);
+        float areaLeft = (mSideBarPosition == POSITION_LEFT) ? 0 : (width - mBarWidth - getPaddingRight());
+        float areaRight = (mSideBarPosition == POSITION_LEFT) ? (getPaddingLeft() + areaLeft + mBarWidth) : width;
+        float areaTop = height/2 - mBarHeight/2;
+        float areaBottom = areaTop + mBarHeight;
+        mStartTouchingArea.set(
+                areaLeft,
+                areaTop,
+                areaRight,
+                areaBottom);
 
         mFirstItemBaseLineY = (height/2 - mIndexItems.length*mIndexItemHeight/2)
                 + (mIndexItemHeight/2 - (fontMetrics.descent-fontMetrics.ascent)/2)
@@ -178,8 +184,8 @@ public class WaveSideBar extends View {
             mPaint.setTextSize(mTextSize + mTextSize*scale);
 
             float drawX = (mSideBarPosition == POSITION_LEFT) ?
-                    (mBarWidth/2 + mMaxOffset*scale) :
-                    (getWidth() - mBarWidth/2 - mMaxOffset*scale);
+                    (getPaddingLeft() + mBarWidth/2 + mMaxOffset*scale) :
+                    (getWidth() - getPaddingRight() - mBarWidth/2 - mMaxOffset*scale);
 
             // draw
             canvas.drawText(
@@ -223,7 +229,7 @@ public class WaveSideBar extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (mBarArea.contains(eventX, eventY)) {
+                if (mStartTouchingArea.contains(eventX, eventY)) {
                     mStartTouching = true;
                     if (!mLazyRespond && onSelectIndexItemListener != null) {
                         mCurrentIndex = getSelectedIndex(eventY);
