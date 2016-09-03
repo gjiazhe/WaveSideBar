@@ -232,9 +232,11 @@ public class WaveSideBar extends View {
                         mCurrentIndex = getSelectedIndex(eventY);
                         onSelectIndexItemListener.onSelectIndexItem(mIndexItems[mCurrentIndex]);
                     }
+                    invalidate();
+                    return true;
+                } else {
+                    return false;
                 }
-                invalidate();
-                return true;
 
             case MotionEvent.ACTION_MOVE:
                 if (mStartTouching && !mLazyRespond && onSelectIndexItemListener != null) {
