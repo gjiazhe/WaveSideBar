@@ -84,8 +84,8 @@ public class WaveSideBar extends View {
      * You can set it to {@link #POSITION_LEFT} for people who use phone with left hand.
      */
     private int mSideBarPosition;
-    private static final int POSITION_RIGHT = 0;
-    private static final int POSITION_LEFT = 1;
+    public static final int POSITION_RIGHT = 0;
+    public static final int POSITION_LEFT = 1;
 
     /**
      * observe the current selected index item
@@ -293,6 +293,15 @@ public class WaveSideBar extends View {
         invalidate();
     }
 
+    public void setPosition(int position) {
+        if (position != POSITION_RIGHT && position != POSITION_LEFT) {
+            throw new IllegalArgumentException("the position must be POSITION_RIGHT or POSITION_LEFT");
+        }
+
+        mSideBarPosition = position;
+        requestLayout();
+    }
+
     public void setMaxOffset(int offset) {
         mMaxOffset = offset;
         invalidate();
@@ -303,6 +312,6 @@ public class WaveSideBar extends View {
     }
 
     public interface OnSelectIndexItemListener {
-        void onSelectIndexItem(String item);
+        void onSelectIndexItem(String index);
     }
 }
