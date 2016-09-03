@@ -19,10 +19,10 @@ import java.util.Arrays;
  */
 public class WaveSideBar extends View {
     private final static int DEFAULT_TEXT_SIZE = 14; // sp
-    private final static int DEFAULT_MAX_OFFSET = 100; //dp
+    private final static int DEFAULT_MAX_OFFSET = 80; //dp
 
-    private final static String[] DEFAULT_INDEX_ITEMS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-            "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private final static String[] DEFAULT_INDEX_ITEMS = {"A", "B", "C", "D", "E", "F", "G", "H", "I",
+            "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
     private String[] mIndexItems;
 
@@ -66,7 +66,9 @@ public class WaveSideBar extends View {
     private float mBarWidth;
 
     /**
-     * flag that the finger is starting touching
+     * Flag that the finger is starting touching.
+     * If true, it means the {@link MotionEvent#ACTION_DOWN} happened but
+     * {@link MotionEvent#ACTION_UP} not yet.
      */
     private boolean mStartTouching = false;
 
@@ -111,18 +113,16 @@ public class WaveSideBar extends View {
 
     public WaveSideBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mDisplayMetrics = context.getResources().getDisplayMetrics();
 
-        TypedArray typedArray = context.obtainStyledAttributes(attrs,
-                R.styleable.WaveSideBar);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.WaveSideBar);
         mLazyRespond = typedArray.getBoolean(R.styleable.WaveSideBar_sidebar_lazy_respond, false);
         mTextColor = typedArray.getColor(R.styleable.WaveSideBar_sidebar_text_color, Color.GRAY);
+        mMaxOffset = typedArray.getDimension(R.styleable.WaveSideBar_sidebar_max_offset, dp2px(DEFAULT_MAX_OFFSET));
         mSideBarPosition = typedArray.getInt(R.styleable.WaveSideBar_sidebar_position, POSITION_RIGHT);
         typedArray.recycle();
 
-        mDisplayMetrics = getContext().getResources().getDisplayMetrics();
-
         mTextSize = sp2px(DEFAULT_TEXT_SIZE);
-        mMaxOffset = dp2px(DEFAULT_MAX_OFFSET);
 
         mIndexItems = DEFAULT_INDEX_ITEMS;
 
@@ -148,6 +148,7 @@ public class WaveSideBar extends View {
         mIndexItemHeight = fontMetrics.bottom - fontMetrics.top;
         mBarHeight = mIndexItems.length * mIndexItemHeight;
 
+        // calculate the width of the longest text as the width of side bar
         for (String indexItem : mIndexItems) {
             mBarWidth = Math.max(mBarWidth, mPaint.measureText(indexItem));
         }
@@ -162,6 +163,7 @@ public class WaveSideBar extends View {
                 areaRight,
                 areaBottom);
 
+        // the baseline Y of the first item' text to draw
         mFirstItemBaseLineY = (height/2 - mIndexItems.length*mIndexItemHeight/2)
                 + (mIndexItemHeight/2 - (fontMetrics.descent-fontMetrics.ascent)/2)
                 - fontMetrics.ascent;
@@ -200,7 +202,7 @@ public class WaveSideBar extends View {
      * calculate the scale factor of the item to draw
      *
      * @param index the index of the item in array {@link #mIndexItems}
-     * @return the scale factor if the item to draw
+     * @return the scale factor of the item to draw
      */
     private float getScale(int index) {
         float scale = 0;
@@ -211,11 +213,6 @@ public class WaveSideBar extends View {
 //                Log.i("scale", mIndexItems[index] + ": " + scale);
         }
         return scale;
-    }
-
-    public void setIndexItems(String[] indexItems) {
-        mIndexItems = Arrays.copyOf(indexItems, indexItems.length);
-        requestLayout();
     }
 
     @Override
@@ -283,9 +280,19 @@ public class WaveSideBar extends View {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, this.mDisplayMetrics);
     }
 
+    public void setIndexItems(String[] indexItems) {
+        mIndexItems = Arrays.copyOf(indexItems, indexItems.length);
+        requestLayout();
+    }
+
     public void setTextColor(int color) {
         mTextColor = color;
         mPaint.setColor(color);
+        invalidate();
+    }
+
+    public void setMaxOffset(int offset) {
+        mMaxOffset = offset;
         invalidate();
     }
 

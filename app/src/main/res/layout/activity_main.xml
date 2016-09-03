@@ -15,13 +15,9 @@
         android:id="@+id/sideBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="20dp"
+        android:paddingLeft="8dp"
         app:sidebar_text_color="@color/colorAccent"
-        app:sidebar_position="left"/>
+        app:sidebar_position="left"
+        app:sidebar_max_offset="80dp"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_centerVertical="true"
-        android:background="@color/colorPrimary"/>
 </RelativeLayout>
