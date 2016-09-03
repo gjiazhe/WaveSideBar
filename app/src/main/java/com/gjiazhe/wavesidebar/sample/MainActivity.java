@@ -1,25 +1,31 @@
 package com.gjiazhe.wavesidebar.sample;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 
-import com.gjiazhe.wavesidebar.WaveSideBar;
 
 public class MainActivity extends AppCompatActivity {
-    WaveSideBar sideBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        sideBar = (WaveSideBar) findViewById(R.id.sideBar);
-        sideBar.setOnSelectIndexItemListener(new WaveSideBar.OnSelectIndexItemListener() {
-            @Override
-            public void onSelectIndexItem(String item) {
-                Log.i("selectItem", item);
-            }
-        });
+    public void openRightPositiomSample(View view) {
+        Intent intent = new Intent(this, RightPositionActivity.class);
+        startActivity(intent);
+    }
+
+    public void openLeftPositiomSample(View view) {
+        Intent intent = new Intent(this, LeftPositionActivity.class);
+        startActivity(intent);
+    }
+
+    public void openCustomIndexSample(View view) {
+        Intent intent = new Intent(this, CustomIndexActivity.class);
+        startActivity(intent);
     }
 }

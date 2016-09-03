@@ -15,6 +15,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LeftPositionActivity" />
+        <activity android:name=".RightPositionActivity" />
+        <activity android:name=".CustomIndexActivity" />
     </application>
 
 </manifest>

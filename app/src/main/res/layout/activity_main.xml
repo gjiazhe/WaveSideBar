@@ -1,23 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_user"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:onClick="openRightPositiomSample">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Right Position Sample"
+            android:textSize="20sp" />
+    </LinearLayout>
 
-    <com.gjiazhe.wavesidebar.WaveSideBar
-        android:id="@+id/sideBar"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="8dp"
-        app:sidebar_text_color="@color/colorAccent"
-        app:sidebar_position="left"
-        app:sidebar_max_offset="80dp"/>
+        android:layout_height="1dp"
+        android:background="#eee" />
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:onClick="openLeftPositiomSample">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Left Position Sample"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#eee" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:onClick="openCustomIndexSample">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Custom Index Sample"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#eee" />
+</LinearLayout>
