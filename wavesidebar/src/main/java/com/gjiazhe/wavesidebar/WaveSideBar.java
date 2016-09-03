@@ -282,7 +282,7 @@ public class WaveSideBar extends View {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, this.mDisplayMetrics);
     }
 
-    public void setIndexItems(String[] indexItems) {
+    public void setIndexItems(String... indexItems) {
         mIndexItems = Arrays.copyOf(indexItems, indexItems.length);
         requestLayout();
     }
