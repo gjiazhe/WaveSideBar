@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 24
@@ -22,4 +23,13 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.1.1'
+}
+
+publish {
+    userOrg = 'gjiazhe'
+    groupId = 'com.gjiazhe'
+    artifactId = 'wavesidebar'
+    publishVersion = '1.0.0'
+    desc = ''
+    website = 'https://github.com/gjiazhe/WaveSideBar'
 }
