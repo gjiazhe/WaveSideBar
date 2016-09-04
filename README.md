@@ -74,3 +74,9 @@ sideBar.setPosition(WaveSideBar.POSITION_LEFT);
 
 <img src="screenshot/position_left.png" width="400">
 
+## Lazy respond
+use **setLazyRespond** to set whether the side bar should respond lazily to your touch events. 
+```java
+sideBar.setLazyRespond(true);
+```
+![Screenshot](screenshot/lazy_respond.gif)
