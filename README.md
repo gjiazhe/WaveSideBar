@@ -1,7 +1,7 @@
 # WaveSideBar
 
 You can use WaveSideBar in the contacts page of your application.  
-Refer to [AlexLiuSheng/AnimSideBar](https://github.com/AlexLiuSheng/AnimSideBar)
+Refer to [AlexLiuSheng/AnimSideBar](https://github.com/AlexLiuSheng/AnimSideBar).
 
 ## Screenshot
 ![Screenshot](screenshot/gif.gif)
@@ -33,7 +33,7 @@ dependencies {
 |:--------------------:|:------------------:|:----------:|:---------:|
 | sidebar_text_color   | color              | Color.GRAY | text color |
 | sidebar_max_offset   | dimension          | 80dp       | offset of the selected item |
-| sidebar_position     | enum [right, left] | right      | left or right in the view |
+| sidebar_position     | enum [right, left] | right      | be placed on left or right in the view |
 | sidebar_lazy_respond | boolean            | false      | If __true__, the listener will not be called until the finger __up__. If __false__, the listener will be called when the finger __down__, __move__ and __up__.|
 
 You can set these attributes in the layout file, or in the java code:

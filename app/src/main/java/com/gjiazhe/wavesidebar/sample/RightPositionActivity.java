@@ -30,7 +30,6 @@ public class RightPositionActivity extends AppCompatActivity {
         rvContacts.setLayoutManager(new LinearLayoutManager(this));
         rvContacts.setAdapter(new ContactsAdapter(contacts, R.layout.item_contacts));
         sideBar = (WaveSideBar) findViewById(R.id.side_bar);
-        sideBar.setLazyRespond(true);
         sideBar.setOnSelectIndexItemListener(new WaveSideBar.OnSelectIndexItemListener() {
             @Override
             public void onSelectIndexItem(String index) {
