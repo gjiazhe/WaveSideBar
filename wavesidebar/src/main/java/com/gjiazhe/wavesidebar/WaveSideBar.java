@@ -223,13 +223,13 @@ public class WaveSideBar extends View {
 
         float eventY = event.getY();
         float eventX = event.getX();
+        mCurrentIndex = getSelectedIndex(eventY);
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (mStartTouchingArea.contains(eventX, eventY)) {
                     mStartTouching = true;
                     if (!mLazyRespond && onSelectIndexItemListener != null) {
-                        mCurrentIndex = getSelectedIndex(eventY);
                         onSelectIndexItemListener.onSelectIndexItem(mIndexItems[mCurrentIndex]);
                     }
                     invalidate();
@@ -240,7 +240,6 @@ public class WaveSideBar extends View {
 
             case MotionEvent.ACTION_MOVE:
                 if (mStartTouching && !mLazyRespond && onSelectIndexItemListener != null) {
-                    mCurrentIndex = getSelectedIndex(eventY);
                     onSelectIndexItemListener.onSelectIndexItem(mIndexItems[mCurrentIndex]);
                 }
                 invalidate();
@@ -249,7 +248,6 @@ public class WaveSideBar extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 if (mLazyRespond && onSelectIndexItemListener != null) {
-                    mCurrentIndex = getSelectedIndex(eventY);
                     onSelectIndexItemListener.onSelectIndexItem(mIndexItems[mCurrentIndex]);
                 }
                 mCurrentIndex = -1;
@@ -305,6 +303,10 @@ public class WaveSideBar extends View {
     public void setMaxOffset(int offset) {
         mMaxOffset = offset;
         invalidate();
+    }
+
+    public void setLazyRespond(boolean lazyRespond) {
+        mLazyRespond = lazyRespond;
     }
 
     public void setOnSelectIndexItemListener(OnSelectIndexItemListener onSelectIndexItemListener) {
