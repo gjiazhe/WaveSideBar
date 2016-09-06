@@ -14,12 +14,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void openRightPositiomSample(View view) {
+    public void openRightPositionSample(View view) {
         Intent intent = new Intent(this, RightPositionActivity.class);
         startActivity(intent);
     }
 
-    public void openLeftPositiomSample(View view) {
+    public void openLeftPositionSample(View view) {
         Intent intent = new Intent(this, LeftPositionActivity.class);
         startActivity(intent);
     }
