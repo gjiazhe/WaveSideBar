@@ -29,7 +29,7 @@ publish {
     userOrg = 'gjiazhe'
     groupId = 'com.gjiazhe'
     artifactId = 'wavesidebar'
-    publishVersion = '1.0.0'
+    publishVersion = '1.0.1'
     desc = ''
     website = 'https://github.com/gjiazhe/WaveSideBar'
 }
