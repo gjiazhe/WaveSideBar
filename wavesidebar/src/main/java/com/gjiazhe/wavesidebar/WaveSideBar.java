@@ -235,6 +235,7 @@ public class WaveSideBar extends View {
                     invalidate();
                     return true;
                 } else {
+                    mCurrentIndex = -1;
                     return false;
                 }
 
