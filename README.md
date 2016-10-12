@@ -11,7 +11,7 @@ With gradle:
 
 ```groovy
 dependencies {
-   compile 'com.gjiazhe:wavesidebar:1.0.1'
+   compile 'com.gjiazhe:wavesidebar:1.0.2'
 }
 ```
 
@@ -29,12 +29,12 @@ dependencies {
 ```
 
 ## Description of Attributes
-| Attributes           | Format             | Default    |Description|
-|:--------------------:|:------------------:|:----------:|:---------:|
-| sidebar_text_color   | color              | Color.GRAY | text color |
-| sidebar_max_offset   | dimension          | 80dp       | offset of the selected item |
-| sidebar_position     | enum [right, left] | right      | be placed on left or right in the view |
-| sidebar_lazy_respond | boolean            | false      | If __true__, the listener will not be called until the finger __up__. If __false__, the listener will be called when the finger __down__, __move__ and __up__.|
+|      Attributes      |       Format       |  Default   |               Description                |
+| :------------------: | :----------------: | :--------: | :--------------------------------------: |
+|  sidebar_text_color  |       color        | Color.GRAY |                text color                |
+|  sidebar_max_offset  |     dimension      |    80dp    |       offset of the selected item        |
+|   sidebar_position   | enum [right, left] |   right    |  be placed on left or right in the view  |
+| sidebar_lazy_respond |      boolean       |   false    | If __true__, the listener will not be called until the finger __up__. If __false__, the listener will be called when the finger __down__, __move__ and __up__. |
 
 You can set these attributes in the layout file, or in the java code:
 ```java
