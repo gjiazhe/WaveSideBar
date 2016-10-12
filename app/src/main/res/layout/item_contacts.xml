@@ -16,9 +16,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:focusable="true"
-        android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground">
+        android:background="?android:attr/selectableItemBackground">
         <ImageView
             android:id="@+id/iv_avatar"
             android:layout_width="40dp"
