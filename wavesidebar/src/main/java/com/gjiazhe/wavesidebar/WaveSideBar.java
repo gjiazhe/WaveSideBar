@@ -88,6 +88,15 @@ public class WaveSideBar extends View {
     public static final int POSITION_LEFT = 1;
 
     /**
+     * the alignment of items, default is {@link #TEXT_ALIGN_CENTER}.
+     */
+    private int mTextAlignment;
+    public static final int TEXT_ALIGN_CENTER = 0;
+    public static final int TEXT_ALIGN_LEFT = 1;
+    public static final int TEXT_ALIGN_RIGHT = 2;
+
+
+    /**
      * observe the current selected index item
      */
     private OnSelectIndexItemListener onSelectIndexItemListener;
@@ -120,6 +129,7 @@ public class WaveSideBar extends View {
         mTextColor = typedArray.getColor(R.styleable.WaveSideBar_sidebar_text_color, Color.GRAY);
         mMaxOffset = typedArray.getDimension(R.styleable.WaveSideBar_sidebar_max_offset, dp2px(DEFAULT_MAX_OFFSET));
         mSideBarPosition = typedArray.getInt(R.styleable.WaveSideBar_sidebar_position, POSITION_RIGHT);
+        mTextAlignment = typedArray.getInt(R.styleable.WaveSideBar_sidebar_text_alignment, TEXT_ALIGN_CENTER);
         typedArray.recycle();
 
         mTextSize = sp2px(DEFAULT_TEXT_SIZE);
@@ -132,9 +142,13 @@ public class WaveSideBar extends View {
     private void initPaint() {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setTextAlign(Paint.Align.CENTER);
         mPaint.setColor(mTextColor);
         mPaint.setTextSize(mTextSize);
+        switch (mTextAlignment) {
+            case TEXT_ALIGN_CENTER: mPaint.setTextAlign(Paint.Align.CENTER); break;
+            case TEXT_ALIGN_LEFT:   mPaint.setTextAlign(Paint.Align.LEFT); break;
+            case TEXT_ALIGN_RIGHT:  mPaint.setTextAlign(Paint.Align.RIGHT); break;
+        }
     }
 
     @Override
@@ -178,22 +192,45 @@ public class WaveSideBar extends View {
             float baseLineY = mFirstItemBaseLineY + mIndexItemHeight*i;
 
             // calculate the scale factor of the item to draw
-            float scale = getScale(i);
+            float scale = getItemScale(i);
 
             int alphaScale = (i == mCurrentIndex) ? (255) : (int) (255 * (1-scale));
             mPaint.setAlpha(alphaScale);
 
             mPaint.setTextSize(mTextSize + mTextSize*scale);
 
-            float drawX = (mSideBarPosition == POSITION_LEFT) ?
-                    (getPaddingLeft() + mBarWidth/2 + mMaxOffset*scale) :
-                    (getWidth() - getPaddingRight() - mBarWidth/2 - mMaxOffset*scale);
+            float baseLineX = 0f;
+            if (mSideBarPosition == POSITION_LEFT) {
+                switch (mTextAlignment) {
+                    case TEXT_ALIGN_CENTER:
+                        baseLineX = getPaddingLeft() + mBarWidth/2 + mMaxOffset*scale;
+                        break;
+                    case TEXT_ALIGN_LEFT:
+                        baseLineX = getPaddingLeft() + mMaxOffset*scale;
+                        break;
+                    case TEXT_ALIGN_RIGHT:
+                        baseLineX = getPaddingLeft() + mBarWidth + mMaxOffset*scale;
+                        break;
+                }
+            } else {
+                switch (mTextAlignment) {
+                    case TEXT_ALIGN_CENTER:
+                        baseLineX = getWidth() - getPaddingRight() - mBarWidth/2 - mMaxOffset*scale;
+                        break;
+                    case TEXT_ALIGN_RIGHT:
+                        baseLineX = getWidth() - getPaddingRight() - mMaxOffset*scale;
+                        break;
+                    case TEXT_ALIGN_LEFT:
+                        baseLineX = getWidth() - getPaddingRight() - mBarWidth - mMaxOffset*scale;
+                        break;
+                }
+            }
 
             // draw
             canvas.drawText(
                     mIndexItems[i], //item text to draw
-                    drawX, //center text X
-                    baseLineY, // baseLineY
+                    baseLineX, //baseLine X
+                    baseLineY, // baseLine Y
                     mPaint);
         }
     }
@@ -204,13 +241,12 @@ public class WaveSideBar extends View {
      * @param index the index of the item in array {@link #mIndexItems}
      * @return the scale factor of the item to draw
      */
-    private float getScale(int index) {
+    private float getItemScale(int index) {
         float scale = 0;
         if (mCurrentIndex != -1) {
             float distance = Math.abs(mCurrentY - (mIndexItemHeight*index+mIndexItemHeight/2)) / mIndexItemHeight;
             scale = 1 - distance*distance/16;
             scale = Math.max(scale, 0);
-//                Log.i("scale", mIndexItems[index] + ": " + scale);
         }
         return scale;
     }
@@ -308,6 +344,22 @@ public class WaveSideBar extends View {
 
     public void setLazyRespond(boolean lazyRespond) {
         mLazyRespond = lazyRespond;
+    }
+
+    public void setTextAlign(int align) {
+        if (mTextAlignment == align) {
+            return;
+        }
+        switch (align) {
+            case TEXT_ALIGN_CENTER: mPaint.setTextAlign(Paint.Align.CENTER); break;
+            case TEXT_ALIGN_LEFT:   mPaint.setTextAlign(Paint.Align.LEFT); break;
+            case TEXT_ALIGN_RIGHT:  mPaint.setTextAlign(Paint.Align.RIGHT); break;
+            default:
+                throw new IllegalArgumentException(
+                        "the alignment must be TEXT_ALIGN_CENTER, TEXT_ALIGN_LEFT or TEXT_ALIGN_RIGHT");
+        }
+        mTextAlignment = align;
+        invalidate();
     }
 
     public void setOnSelectIndexItemListener(OnSelectIndexItemListener onSelectIndexItemListener) {
