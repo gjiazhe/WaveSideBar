@@ -11,7 +11,7 @@ With gradle:
 
 ```groovy
 dependencies {
-   compile 'com.gjiazhe:wavesidebar:1.0.2'
+   compile 'com.gjiazhe:wavesidebar:1.1'
 }
 ```
 
@@ -25,16 +25,18 @@ dependencies {
         app:sidebar_position="right"
         app:sidebar_max_offset="80dp"
         app:sidebar_lazy_respond="false"
-        app:sidebar_text_color="#8D6E63"/>
+        app:sidebar_text_color="#8D6E63"
+        app:sidebar_text_alignment="center"/>
 ```
 
 ## Description of Attributes
-|      Attributes      |       Format       |  Default   |               Description                |
-| :------------------: | :----------------: | :--------: | :--------------------------------------: |
-|  sidebar_text_color  |       color        | Color.GRAY |                text color                |
-|  sidebar_max_offset  |     dimension      |    80dp    |       offset of the selected item        |
-|   sidebar_position   | enum [right, left] |   right    |  be placed on left or right in the view  |
-| sidebar_lazy_respond |      boolean       |   false    | If __true__, the listener will not be called until the finger __up__. If __false__, the listener will be called when the finger __down__, __move__ and __up__. |
+|       Attributes       |           Format           |  Default   |               Description                |
+| :--------------------: | :------------------------: | :--------: | :--------------------------------------: |
+|   sidebar_text_color   |           color            | Color.GRAY |               Text color.                |
+|   sidebar_max_offset   |         dimension          |    80dp    |       Offset of the selected item.       |
+|    sidebar_position    |    enum  {right,  left}    |   right    | Be placed on left or right in the view.  |
+| sidebar_text_alignment | enum {center, left, right} |   center   |           Alignment of items.            |
+|  sidebar_lazy_respond  |          boolean           |   false    | If __true__, the listener will not be called until the finger __up__. If __false__, the listener will be called when the finger __down__, __move__ and __up__. |
 
 You can set these attributes in the layout file, or in the java code:
 ```java
@@ -42,6 +44,7 @@ WaveSideBar sideBar = (WaveSideBar) findViewById(R.id.side_bar);
 sideBar.setTextColor(Color.BLACK);
 sideBar.setMaxOffset(100);
 sideBar.setPosition(WaveSideBar.POSITION_LEFT);
+sideBar.setTextAlign(WaveSideBar.TEXT_ALIGN_CENTER);
 sideBar.setLazyRespond(true);
 ```
 
