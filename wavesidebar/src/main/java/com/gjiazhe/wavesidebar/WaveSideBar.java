@@ -233,6 +233,10 @@ public class WaveSideBar extends View {
                     baseLineY, // baseLine Y
                     mPaint);
         }
+
+        // reset paint
+        mPaint.setAlpha(255);
+        mPaint.setTextSize(mTextSize);
     }
 
     /**
