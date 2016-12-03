@@ -11,7 +11,7 @@ With gradle:
 
 ```groovy
 dependencies {
-   compile 'com.gjiazhe:wavesidebar:1.1'
+   compile 'com.gjiazhe:wavesidebar:1.2'
 }
 ```
 
