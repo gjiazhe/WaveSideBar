@@ -11,7 +11,7 @@ With gradle:
 
 ```groovy
 dependencies {
-   compile 'com.gjiazhe:wavesidebar:1.2'
+   compile 'com.gjiazhe:wavesidebar:1.3'
 }
 ```
 
@@ -26,6 +26,7 @@ dependencies {
         app:sidebar_max_offset="80dp"
         app:sidebar_lazy_respond="false"
         app:sidebar_text_color="#8D6E63"
+        app:sidebar_text_size="14sp"
         app:sidebar_text_alignment="center"/>
 ```
 
