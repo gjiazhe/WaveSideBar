@@ -127,12 +127,11 @@ public class WaveSideBar extends View {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.WaveSideBar);
         mLazyRespond = typedArray.getBoolean(R.styleable.WaveSideBar_sidebar_lazy_respond, false);
         mTextColor = typedArray.getColor(R.styleable.WaveSideBar_sidebar_text_color, Color.GRAY);
+        mTextSize = typedArray.getDimension(R.styleable.WaveSideBar_sidebar_text_size, sp2px(DEFAULT_TEXT_SIZE));
         mMaxOffset = typedArray.getDimension(R.styleable.WaveSideBar_sidebar_max_offset, dp2px(DEFAULT_MAX_OFFSET));
         mSideBarPosition = typedArray.getInt(R.styleable.WaveSideBar_sidebar_position, POSITION_RIGHT);
         mTextAlignment = typedArray.getInt(R.styleable.WaveSideBar_sidebar_text_alignment, TEXT_ALIGN_CENTER);
         typedArray.recycle();
-
-        mTextSize = sp2px(DEFAULT_TEXT_SIZE);
 
         mIndexItems = DEFAULT_INDEX_ITEMS;
 
@@ -363,6 +362,15 @@ public class WaveSideBar extends View {
                         "the alignment must be TEXT_ALIGN_CENTER, TEXT_ALIGN_LEFT or TEXT_ALIGN_RIGHT");
         }
         mTextAlignment = align;
+        invalidate();
+    }
+
+    public void setTextSize(float size) {
+        if (mTextSize == size) {
+            return;
+        }
+        mTextSize = size;
+        mPaint.setTextSize(size);
         invalidate();
     }
 

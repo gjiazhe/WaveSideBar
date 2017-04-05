@@ -32,7 +32,8 @@ dependencies {
 ## Description of Attributes
 |       Attributes       |           Format           |  Default   |               Description                |
 | :--------------------: | :------------------------: | :--------: | :--------------------------------------: |
-|   sidebar_text_color   |           color            | Color.GRAY |               Text color.                |
+|   sidebar_text_color   |           color            | Color.GRAY |         Text color of side bar.          |
+|   sidebar_text_size    |         dimension          |    14sp    |          Text size of side bar.          |
 |   sidebar_max_offset   |         dimension          |    80dp    |       Offset of the selected item.       |
 |    sidebar_position    |    enum  {right,  left}    |   right    | Be placed on left or right in the view.  |
 | sidebar_text_alignment | enum {center, left, right} |   center   |           Alignment of items.            |

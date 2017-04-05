@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="WaveSideBar">
         <attr name="sidebar_lazy_respond" format="boolean"/>
+        <attr name="sidebar_text_size" format="dimension"/>
         <attr name="sidebar_text_color" format="color"/>
         <attr name="sidebar_max_offset" format="dimension"/>
         <attr name="sidebar_position" format="enum">
